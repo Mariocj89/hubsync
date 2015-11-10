@@ -170,4 +170,11 @@ class SyncHelper(object):
             # set fork
             # TODO
 
+        def sync_branches():
+            """Sincs/update/clean local/fork branches
+
+            """
+            
+
         sync_remotes()
+        sync_branches()
