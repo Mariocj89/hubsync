@@ -13,7 +13,7 @@ LOG = logging.getLogger('hubsync.sync')
 
 @contextmanager
 def git_wrap(git_item):
-    cw = git_item.config_writter
+    cw = git_item.config_writer
     yield cw
     cw.release()
 
@@ -125,7 +125,8 @@ class SyncHelper(object):
                 local_org.repos, github_origin.repos,
                 lambda x, y: cmp(x.name, y.name)):
             if not github_repo:
-                print("Found repo {} locally but not in github.")
+                print("Found repo {} locally but not in github."
+                      .format(local_repo.name))
                 if input_yesno("Delete locally?", "no"):
                     shutil.rmtree(local_repo.path)
                 continue
@@ -157,24 +158,45 @@ class SyncHelper(object):
             - upstream: origin with push options
             - fork: user's fork of the repo
             """
+            LOG.debug("Syncing remotes")
             # set origin
-            origin = local_repo.git.create_remote('origin', github_repo.url)
+            try:
+                origin = local_repo.git.remote('origin')
+            except ValueError:
+                origin = local_repo.git.create_remote('origin', github_repo.url)
             with git_wrap(origin) as writer:
                 writer.set('pushurl', 'nopush')
             origin.fetch()
 
             # set upstream
-            upstream = local_repo.git.create_remote('upstream', github_repo.url)
+            try:
+                upstream = local_repo.git.remote('upstream')
+            except ValueError:
+                upstream = local_repo.git.create_remote('upstream',
+                                                        github_repo.url)
             upstream.fetch()
 
             # set fork
             # TODO
 
         def sync_branches():
-            """Sincs/update/clean local/fork branches
+            """Sincs/update/clean local/fork branches"""
+            LOG.debug("Syncing branches")
+            # clean merged branches
+            for branch in local_repo.git.heads:
+                commits_ahead = list(local_repo.git.iter_commits(
+                    "origin/master..{}".format(branch.name)))
+                commits_behind = list(local_repo.git.iter_commits(
+                    "{}..origin/master".format(branch.name)))
+                if not commits_ahead and commits_behind:
+                    print("Found stale branch {} locally.".format(branch.name))
+                    if input_yesno("Delete locally?", "yes"):
+                        local_repo.git.delete_head(branch.name)
 
-            """
-            
+        def sync_fork():
+            """Syncs and clears the fork (if any)"""
+            pass
 
         sync_remotes()
         sync_branches()
+        sync_fork()
