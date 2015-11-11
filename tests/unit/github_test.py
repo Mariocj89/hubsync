@@ -3,7 +3,7 @@
 import unittest
 import mock
 
-from hubsync.github import Api, Organization
+from hubsync.github import Api, Organization, Repo
 
 
 class ApiTestCase(unittest.TestCase):
@@ -59,7 +59,7 @@ class ApiTestCase(unittest.TestCase):
             'description': 'description!',
             'repos_url': 'http://localhost/repos'
         })
-        org = Organization(self.api, 'the org url!')
+        org = Organization.from_url(self.api, 'the org url!')
         print repr(org)
         self.assertEqual('sample_org', org.name)
         self.assertEqual('description!', org.description)
@@ -74,15 +74,34 @@ class ApiTestCase(unittest.TestCase):
                 }
             elif 'repos' in url:
                 return [{
+                    'url': 'http://localhost/a_repo'
+                }]
+            elif 'a_repo' in url:
+                return {
+                    'owner': {
+                        "login": "the_user"
+                    },
                     'name': 'sample_repo',
                     'description': 'description!',
-                    'ssh_url': 'http://localhost/repos'
-                }]
+                    'ssh_url': 'http://localhost/repos',
+                    'forks_url': 'http://localhost/repos/forks'
+                }
             else:
                 raise ValueError()
         self.api.get = mock.MagicMock(side_effect=call_api)
-        org = Organization(self.api, 'the org url!')
+        org = Organization.from_url(self.api, 'the org url!')
         self.assertEqual(len(org.repos), 1)
+
+    @mock.patch('hubsync.github.Api.get')
+    def test_get_forks_of_repo(self, requests_mock):
+        requests_mock.return_value = [{
+            "name": "fork_name",
+            "description": "desc",
+            "ssh_url": "clone_me"
+        }]
+
+        tested_repo = Repo(self.api, 'user', 'name', 'desc', 'the_url', 'forks')
+        self.assertEqual(1, len(tested_repo.forks))
 
 
 if __name__ == '__main__':
