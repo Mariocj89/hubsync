@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
   name = 'hubsync',
   packages = ['hubsync'],
-  version = '0.1.2',
+  version = '0.1.3',
   description = 'Get your github workspace synced!',
   author = 'Mario Corchero',
   author_email = 'mariocj89@gmail.com',
@@ -12,4 +12,6 @@ setup(
   scripts=['hubsync.py'],
   test_suite = 'nose.collector',
   use_2to3=True,
+  install_requires=['gitpython', 'requests'],
+  test_requires=['mock']
 )
