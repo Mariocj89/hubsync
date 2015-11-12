@@ -9,7 +9,7 @@ setup(
   author_email = 'mariocj89@gmail.com',
   url = 'https://github.com/Mariocj89/hubsync',
   keywords = ['github', 'sync', 'workspace'],
-  scripts=['hubsync.py'],
+  scripts=['bin/hubsync'],
   test_suite = 'nose.collector',
   use_2to3=True,
   install_requires=['gitpython', 'requests'],
