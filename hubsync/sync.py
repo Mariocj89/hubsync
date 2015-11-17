@@ -17,6 +17,7 @@ import git
 
 from . import workspace
 
+
 LOG = logging.getLogger('hubsync.sync')
 
 

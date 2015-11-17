@@ -1,6 +1,7 @@
 """Module with the same name tests"""
 
 import unittest
+
 import mock
 
 from hubsync.github import Api, Organization, Repo
@@ -8,6 +9,7 @@ from hubsync.github import Api, Organization, Repo
 
 class ApiTestCase(unittest.TestCase):
     """Tests for the gb api"""
+
     def setUp(self):
         self.api = Api('sample_url', 'awesome token')
 
@@ -35,6 +37,7 @@ class ApiTestCase(unittest.TestCase):
                 }
             else:
                 raise ValueError()
+
         self.api.get = mock.MagicMock(side_effect=call_api)
         self.assertEqual(len(self.api.organizations), 1)
 
@@ -50,6 +53,7 @@ class ApiTestCase(unittest.TestCase):
                 }
             else:
                 raise ValueError()
+
         self.api.get = mock.MagicMock(side_effect=call_api)
         self.assertEqual(len(self.api.organizations), 2)
 
@@ -74,8 +78,8 @@ class ApiTestCase(unittest.TestCase):
                 }
             elif 'repos' in url:
                 return [{
-                    'url': 'http://localhost/a_repo'
-                }]
+                            'url': 'http://localhost/a_repo'
+                        }]
             elif 'a_repo' in url:
                 return {
                     'owner': {
@@ -88,6 +92,7 @@ class ApiTestCase(unittest.TestCase):
                 }
             else:
                 raise ValueError()
+
         self.api.get = mock.MagicMock(side_effect=call_api)
         org = Organization.from_url(self.api, 'the org url!')
         self.assertEqual(len(org.repos), 1)
@@ -95,10 +100,10 @@ class ApiTestCase(unittest.TestCase):
     @mock.patch('hubsync.github.Api.get')
     def test_get_forks_of_repo(self, requests_mock):
         requests_mock.return_value = [{
-            "name": "fork_name",
-            "description": "desc",
-            "ssh_url": "clone_me"
-        }]
+                                          "name": "fork_name",
+                                          "description": "desc",
+                                          "ssh_url": "clone_me"
+                                      }]
 
         tested_repo = Repo(self.api, 'user', 'name', 'desc', 'the_url', 'forks')
         self.assertEqual(1, len(tested_repo.forks))

@@ -4,6 +4,7 @@ import os
 
 import git
 
+
 LOG = logging.getLogger('hubsync.workspace')
 
 
@@ -23,6 +24,7 @@ def get_sub_folders(path):
 
 class Workspace(object):
     """Represents the current workspace directory"""
+
     def __init__(self, path):
         self.path = path
 

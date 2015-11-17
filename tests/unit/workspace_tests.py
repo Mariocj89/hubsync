@@ -1,7 +1,9 @@
 """Tests for hubsync.workspace module"""
 import unittest
+
 import git
 import mock
+
 from hubsync.workspace import Organization, InvalidPath, Workspace, Repo
 
 
@@ -53,7 +55,8 @@ class OrgTestCase(unittest.TestCase):
 
     @mock.patch("hubsync.workspace.get_sub_folders")
     @mock.patch("git.Repo")
-    def test_org_with_a_subfolders_but_not_a_repo_raises(self, mock_git, mock_subfolders):
+    def test_org_with_a_subfolders_but_not_a_repo_raises(self, mock_git,
+                                                         mock_subfolders):
         mock_git.side_effect = git.exc.InvalidGitRepositoryError
         mock_subfolders.return_value = ["secret_folder_without_repo"]
         self.assertRaises(InvalidPath, lambda: self.org.repos)

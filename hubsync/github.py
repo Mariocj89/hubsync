@@ -4,6 +4,7 @@ import logging
 
 import requests
 
+
 LOG = logging.getLogger("hubsync.api")
 
 Fork = collections.namedtuple('Fork', 'name description fork_owner origin_url'

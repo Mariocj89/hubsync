@@ -6,6 +6,7 @@ import argparse
 
 from hubsync import github, workspace, sync
 
+
 LOG = logging.getLogger('hubsync')
 LOG.setLevel(logging.INFO)
 LOG.addHandler(logging.StreamHandler())
