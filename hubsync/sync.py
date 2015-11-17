@@ -1,4 +1,13 @@
-"""File wrapping sync related functions"""
+"""File wrapping sync related functions,
+
+You will see that this files uses the workspace repo/org and the github repo/org
+ together with the raw Api of git for example. We are aware this is not the best
+ design and ideally all git calls should be hidden within the workspace module
+ but we chose to be pragmatic for the moment as doing so will raise the current
+ complexity of the workspace module in a way that is not justifiable for the
+ moment. Lets not make best the enemy of better :). You are though welcome to
+ come up with a better solution.
+"""
 from contextlib import contextmanager
 import logging
 import shutil
