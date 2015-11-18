@@ -3,6 +3,7 @@
 import os
 import logging
 import argparse
+import ConfigParser
 
 from hubsync import github, workspace, sync
 
@@ -12,15 +13,30 @@ LOG.setLevel(logging.INFO)
 LOG.addHandler(logging.StreamHandler())
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Keeps your repos in sync!")
+    config = ConfigParser.ConfigParser(defaults={
+        'api_url': 'https://api.github.com',
+        'token': None
+    })
+    config.read(os.path.expanduser('~/.hubsyncrc'))
+    if not config.has_section('github'):
+        config.add_section('github')
+
+    parser = argparse.ArgumentParser(description="Keeps your repos in sync! "
+                                                 "Note: Reads defaults from "
+                                                 "~/.hubsyncrc")
     parser.add_argument('--github_api_url', type=str,
-                        default="https://api.github.com")
-    parser.add_argument('--github_token', type=str, required=True)
+                        required=not config.get('github', 'api_url'),
+                        default=config.get('github', 'api_url'))
+    parser.add_argument('--github_token', type=str,
+                        required=not config.get('github', 'token'),
+                        default=config.get('github', 'token'))
     args = parser.parse_args()
 
-    api_args = dict()
-    api_args["api_url"] = args.github_api_url
-    api_args["user_token"] = args.github_token
+    api_args = {
+        "api_url": args.github_api_url,
+        "user_token": args.github_token
+    }
+
     github_api = github.Api(**api_args)
     local_workspace = workspace.Workspace(os.getcwd())
 
