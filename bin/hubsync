@@ -23,7 +23,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Keeps your repos in sync! "
                                                  "Note: Reads defaults from "
-                                                 "~/.hubsyncrc")
+                                                 "~/.hubsyncrc",
+                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     parser.add_argument('--github_api_url', type=str,
                         required=not config.get('github', 'api_url'),
                         default=config.get('github', 'api_url'))
