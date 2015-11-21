@@ -15,11 +15,13 @@ LOG.addHandler(logging.StreamHandler())
 if __name__ == "__main__":
     config = ConfigParser.ConfigParser(defaults={
         'api_url': 'https://api.github.com',
-        'token': None
+        'token': None,
+        'path': os.getcwd()
     })
     config.read(os.path.expanduser('~/.hubsyncrc'))
-    if not config.has_section('github'):
-        config.add_section('github')
+    for section in ['github', 'workspace']:
+        if not config.has_section(section):
+            config.add_section(section)
 
     parser = argparse.ArgumentParser(description="Keeps your repos in sync! "
                                                  "Note: Reads defaults from "
@@ -28,10 +30,16 @@ if __name__ == "__main__":
 
     parser.add_argument('--github_api_url', type=str,
                         required=not config.get('github', 'api_url'),
-                        default=config.get('github', 'api_url'))
+                        default=config.get('github', 'api_url'),
+                        help="Base URL for the github instance.")
     parser.add_argument('--github_token', type=str,
                         required=not config.get('github', 'token'),
-                        default=config.get('github', 'token'))
+                        default=config.get('github', 'token'),
+                        help="Private user token to get access to github")
+    parser.add_argument('--ws_path', type=str,
+                        required=not config.get('workspace', 'path'),
+                        default=config.get('workspace', 'path'),
+                        help="base path of your local workspace.")
     args = parser.parse_args()
 
     api_args = {
@@ -40,7 +48,7 @@ if __name__ == "__main__":
     }
 
     github_api = github.Api(**api_args)
-    local_workspace = workspace.Workspace(os.getcwd())
+    local_workspace = workspace.Workspace(args.ws_path)
 
     sync_helper = sync.SyncHelper(github_api)
     sync_helper.sync_all(
