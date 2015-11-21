@@ -14,5 +14,5 @@ setup(
     test_suite='nose.collector',
     use_2to3=True,
     install_requires=['gitpython', 'requests'],
-    test_requires=['mock']
+    tests_require=['mock']
 )
