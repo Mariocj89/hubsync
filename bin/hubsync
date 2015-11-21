@@ -12,6 +12,12 @@ LOG = logging.getLogger('hubsync')
 LOG.setLevel(logging.INFO)
 LOG.addHandler(logging.StreamHandler())
 
+def validate_github_access(api):
+    """Checks the user has access to github"""
+    result = api.get(api.base_url)
+    if result.get("message") == "Bad credentials":
+        raise RuntimeError("Invalid credentials. Check your github token")
+
 if __name__ == "__main__":
     config = ConfigParser.ConfigParser(defaults={
         'api_url': 'https://api.github.com',
@@ -48,8 +54,11 @@ if __name__ == "__main__":
     }
 
     github_api = github.Api(**api_args)
-    local_workspace = workspace.Workspace(args.ws_path)
+    local_workspace = workspace.Workspace(os.path.expanduser(args.ws_path))
 
+    validate_github_access(github_api)
+
+    print("Syncing '{}'".format(args.ws_path))
     sync_helper = sync.SyncHelper(github_api)
     sync_helper.sync_all(
         workspaces=local_workspace.organizations,
