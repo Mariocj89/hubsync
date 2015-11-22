@@ -103,6 +103,11 @@ class SyncHelper(object):
         self.api = api
         self.config = config
 
+    def sync(self, workspace, github_api):
+        """Syncs using a workspace and a github api"""
+        self.sync_all(workspace.organizations,
+                      github_api.organizations)
+
     def sync_all(self, workspaces, github_organizations):
         """Syncs workspace organizations with github
 

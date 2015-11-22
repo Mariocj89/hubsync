@@ -62,9 +62,6 @@ if __name__ == "__main__":
 
     print("Syncing '{}'".format(args.ws_path))
     sync_helper = sync.SyncHelper(github_api, config)
-    sync_helper.sync_all(
-        workspaces=local_workspace.organizations,
-        github_organizations=github_api.organizations
-    )
+    sync_helper.sync(local_workspace, github_api)
 
 
