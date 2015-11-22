@@ -22,10 +22,12 @@ if __name__ == "__main__":
     config = ConfigParser.ConfigParser(defaults={
         'api_url': 'https://api.github.com',
         'token': None,
-        'path': os.getcwd()
+        'path': os.getcwd(),
+        'pre': [],
+        'post': []
     })
     config.read(os.path.expanduser('~/.hubsyncrc'))
-    for section in ['github', 'workspace']:
+    for section in ['github', 'workspace', 'org', 'repo']:
         if not config.has_section(section):
             config.add_section(section)
 
@@ -59,7 +61,7 @@ if __name__ == "__main__":
     validate_github_access(github_api)
 
     print("Syncing '{}'".format(args.ws_path))
-    sync_helper = sync.SyncHelper(github_api)
+    sync_helper = sync.SyncHelper(github_api, config)
     sync_helper.sync_all(
         workspaces=local_workspace.organizations,
         github_organizations=github_api.organizations

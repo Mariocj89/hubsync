@@ -12,6 +12,7 @@ from contextlib import contextmanager
 import logging
 import shutil
 import os
+import subprocess
 
 import git
 
@@ -82,16 +83,25 @@ def input_yesno(question, default="yes"):
             print("Please respond with 'yes' or 'no' (or 'y' or 'n').")
 
 
+def run_commands(command_list):
+    """Runs a list of command in the current workspace"""
+    for command in command_list:
+        subprocess.call(command, shell=True)
+
+
 class SyncHelper(object):
     """Class that wraps the synchronization of objects"""
 
-    def __init__(self, api):
+    def __init__(self, api, config):
         """ Initializes the sync helper
 
         :type api: hubsync.api
+        :type config: ConfigParser.ConfigParser
         :param api: github helper
+        :param config: parsed global configuration
         """
         self.api = api
+        self.config = config
 
     def sync_all(self, workspaces, github_organizations):
         """Syncs workspace organizations with github
@@ -122,7 +132,9 @@ class SyncHelper(object):
                     continue
 
             with cd(local_workspace.path):
+                run_commands(self.config.get('org', 'pre'))
                 self.sync_org(local_workspace, github_org)
+                run_commands(self.config.get('org', 'post'))
 
     def sync_org(self, local_org, github_origin):
         """Syncs the org across the workspace and the origin
@@ -152,7 +164,9 @@ class SyncHelper(object):
                     continue
 
             with cd(local_repo.path):
+                run_commands(self.config.get('repo', 'pre'))
                 self.sync_repo(local_repo, github_repo)
+                run_commands(self.config.get('repo', 'post'))
 
     def sync_repo(self, local_repo, github_repo):
         """Syncs the repo with github
