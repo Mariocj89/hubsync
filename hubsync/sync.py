@@ -131,7 +131,7 @@ class SyncHelper(object):
                 print("Found organization {} in github but not locally."
                       .format(github_org.name))
                 if input_yesno("Clone locally?", "yes"):
-                    os.makedirs(github_org.path)
+                    os.makedirs(github_org.name)
                     local_workspace = workspace.Organization(github_org.name)
                 else:
                     continue
