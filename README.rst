@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/Mariocj89/hubsync.svg?branch=master
+    :target: https://travis-ci.org/Mariocj89/hubsync
+
 Hubsync
 #######
 

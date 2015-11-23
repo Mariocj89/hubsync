@@ -43,9 +43,9 @@ class SanityTestCase(unittest.TestCase):
 
     def setUp(self):
         self.base_url = 'base'
-        self.path = subprocess.check_output('mktemp -d',
-                                            shell=True).splitlines()[0]
-        print("Running tests in " + self.path)
+        self.path = str(subprocess.check_output('mktemp -d',
+                                                shell=True).splitlines()[0])
+        print("Running tests in {}".format(self.path))
         self.gh_api = github.Api(api_url=self.base_url, user_token='')
         self.ws = workspace.Workspace(self.path)
         # we should create a wrapper on top of config parser
@@ -129,4 +129,3 @@ class SanityTestCase(unittest.TestCase):
         self.assertEqual(['test.post'], org_tree[1])
         # no files
         self.assertEqual(['test.pre'], org_tree[2])
-
