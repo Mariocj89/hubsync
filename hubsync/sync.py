@@ -29,17 +29,22 @@ def git_wrap(git_item):
     cw.release()
 
 
-def izip_pairs(xs, ys, cmp_):
+def zip_pairs(xs, ys, key=lambda x: x):
     """Generate pairs that match a cmp function"""
-    xs = list(reversed(sorted(xs, cmp_)))
-    ys = list(reversed(sorted(ys, cmp_)))
+    xs = list(reversed(sorted(xs, key=key)))
+    ys = list(reversed(sorted(ys, key=key)))
 
     while xs or ys:
-        delta = ((not xs) - (not ys)) or cmp_(xs[-1], ys[-1])
-
-        x = xs.pop() if delta <= 0 else None
-        y = ys.pop() if delta >= 0 else None
-        yield x, y
+        if xs and not ys:
+            yield xs.pop(), None
+        elif ys and not xs:
+            yield None, ys.pop()
+        elif key(xs[-1]) == key(ys[-1]):
+            yield xs.pop(), ys.pop()
+        elif key(xs[-1]) > key(ys[-1]):
+            yield xs.pop(), None
+        else:
+            yield None, ys.pop()
 
 
 @contextmanager
@@ -112,9 +117,9 @@ class SyncHelper(object):
         """
         LOG.debug("Syncing organizations. workspace {} with github {}"
                   .format(local_workspace, github_api))
-        for local_org, github_org in izip_pairs(
+        for local_org, github_org in zip_pairs(
                 local_workspace.organizations, github_api.organizations,
-                lambda x, y: cmp(x.name, y.name)):
+                lambda x: x.name):
 
             if not github_org:
                 print("Found organization {} locally but not in github."
@@ -145,7 +150,7 @@ class SyncHelper(object):
         :param github_origin: github storage of the org
         """
         LOG.info("Syncing organization {}".format(local_org.name))
-        for local_repo, github_repo in izip_pairs(
+        for local_repo, github_repo in zip_pairs(
                 local_org.repos, github_origin.repos,
                 lambda x, y: cmp(x.name, y.name)):
             if not github_repo:

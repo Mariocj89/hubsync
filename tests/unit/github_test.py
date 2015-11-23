@@ -64,7 +64,7 @@ class ApiTestCase(unittest.TestCase):
             'repos_url': 'http://localhost/repos'
         })
         org = Organization.from_url(self.api, 'the org url!')
-        print repr(org)
+        print(repr(org))
         self.assertEqual('sample_org', org.name)
         self.assertEqual('description!', org.description)
 

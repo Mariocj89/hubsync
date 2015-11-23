@@ -3,7 +3,10 @@
 import os
 import logging
 import argparse
-import ConfigParser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 
 from hubsync import github, workspace, sync
 
@@ -20,7 +23,7 @@ def validate_github_access(api):
         raise RuntimeError("Invalid credentials. Check your github token")
 
 if __name__ == "__main__":
-    config = ConfigParser.ConfigParser(defaults={
+    config = configparser.ConfigParser(defaults={
         'api_url': 'https://api.github.com',
         'token': None,
         'path': os.getcwd(),
@@ -35,7 +38,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Keeps your repos in sync! "
                                                  "Note: Reads defaults from "
                                                  "~/.hubsyncrc",
-                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--github_api_url', type=str,
                         required=not config.get('github', 'api_url'),

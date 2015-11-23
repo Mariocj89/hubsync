@@ -4,7 +4,10 @@ import os
 import shutil
 import unittest
 import subprocess
-import ConfigParser
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 
 import mock
 from hubsync import sync, github, workspace
@@ -42,14 +45,15 @@ class SanityTestCase(unittest.TestCase):
         os.makedirs(os.path.join(self.path, name))
 
     def setUp(self):
-        self.base_url = 'base'
-        self.path = str(subprocess.check_output('mktemp -d',
-                                                shell=True).splitlines()[0])
+        self.base_url = u'base'
+        self.path = subprocess.check_output('mktemp -d',
+                                            shell=True).splitlines()[0]
+        self.path = self.path.decode()
         print("Running tests in {}".format(self.path))
         self.gh_api = github.Api(api_url=self.base_url, user_token='')
         self.ws = workspace.Workspace(self.path)
         # we should create a wrapper on top of config parser
-        self.config = ConfigParser.ConfigParser(defaults={
+        self.config = configparser.ConfigParser(defaults={
             'pre': [],
             'post': [],
         })
