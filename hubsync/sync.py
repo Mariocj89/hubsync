@@ -103,42 +103,39 @@ class SyncHelper(object):
         self.api = api
         self.config = config
 
-    def sync(self, workspace, github_api):
-        """Syncs using a workspace and a github api"""
-        self.sync_all(workspace.organizations,
-                      github_api.organizations)
-
-    def sync_all(self, workspaces, github_organizations):
-        """Syncs workspace organizations with github
-
-        :param workspaces:  local workspaces
-        :param github_organizations: remote organizations
+    def sync(self, local_workspace, github_api):
+        """Syncs using a workspace and a github api
+        :param local_workspace:  local workspace object
+        :type local_workspace: hubsync.workspace.Workspace
+        :param github_api: remote organizations
+        :type github_api: hubsync.github.Api
         """
         LOG.debug("Syncing organizations. workspace {} with github {}"
-                  .format(workspaces, github_organizations))
-        for local_workspace, github_org in izip_pairs(
-                workspaces, github_organizations,
+                  .format(local_workspace, github_api))
+        for local_org, github_org in izip_pairs(
+                local_workspace.organizations, github_api.organizations,
                 lambda x, y: cmp(x.name, y.name)):
 
             if not github_org:
                 print("Found organization {} locally but not in github."
-                      .format(local_workspace.name))
+                      .format(local_org.name))
                 if input_yesno("Delete locally?", "no"):
-                    shutil.rmtree(local_workspace.path)
+                    shutil.rmtree(local_org.path)
                 continue
 
-            if not local_workspace:
+            if not local_org:
                 print("Found organization {} in github but not locally."
                       .format(github_org.name))
                 if input_yesno("Clone locally?", "yes"):
                     os.makedirs(github_org.name)
-                    local_workspace = workspace.Organization(github_org.name)
+                    local_org = workspace.Organization(github_org.name,
+                                                       local_workspace.path)
                 else:
                     continue
 
-            with cd(local_workspace.path):
+            with cd(local_org.path):
                 run_commands(self.config.get('org', 'pre'))
-                self.sync_org(local_workspace, github_org)
+                self.sync_org(local_org, github_org)
                 run_commands(self.config.get('org', 'post'))
 
     def sync_org(self, local_org, github_origin):
