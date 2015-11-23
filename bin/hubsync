@@ -12,6 +12,7 @@ LOG = logging.getLogger('hubsync')
 LOG.setLevel(logging.INFO)
 LOG.addHandler(logging.StreamHandler())
 
+
 def validate_github_access(api):
     """Checks the user has access to github"""
     result = api.get(api.base_url)

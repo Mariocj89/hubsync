@@ -98,3 +98,35 @@ class SanityTestCase(unittest.TestCase):
         path_after = list(os.walk(self.path))
         # same result as before the run
         self.assertEqual(path_before, path_after)
+
+    @mock.patch('hubsync.github.Api.get')
+    def test_org_pre_post_executed(self, api_get):
+        """Test pre and post commands are run"""
+        org_name = 'sample_org'
+        api_get.side_effect = gb_api_mock({
+            'orgs': [defaultdict(str, {
+                'url': 'org_url'
+            })],
+            'org_url': defaultdict(str, {
+                'login': org_name,
+                'repos_url': 'repos_url'
+            }),
+            'repos_url': []
+        }, {})
+        self.config.set('org', 'pre', "touch test.pre")
+        self.config.set('org', 'post', "mkdir test.post")
+        self._create_local_org(org_name)
+
+        self.assertEqual(['sample_org'], next(os.walk(self.path))[1])
+
+        self.syncer.sync(self.ws, self.gh_api)
+
+        file_tree = os.walk(self.path)
+        next(file_tree)
+        org_tree = next(file_tree)
+
+        # no dirs
+        self.assertEqual(['test.post'], org_tree[1])
+        # no files
+        self.assertEqual(['test.pre'], org_tree[2])
+

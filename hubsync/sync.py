@@ -83,10 +83,10 @@ def input_yesno(question, default="yes"):
             print("Please respond with 'yes' or 'no' (or 'y' or 'n').")
 
 
-def run_commands(command_list):
-    """Runs a list of command in the current workspace"""
-    for command in command_list:
-        subprocess.call(command, shell=True)
+def run_commands(commands):
+    """Runs a bash command in the current workspace"""
+    if commands:
+        subprocess.call(commands, shell=True)
 
 
 class SyncHelper(object):
