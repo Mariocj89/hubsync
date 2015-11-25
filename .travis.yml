@@ -8,9 +8,13 @@ addons:
     packages:
       - pylint
 install:
+  - pip install coveralls
   - pip install pep8
   - pip install -r requirements.txt
 script:
   - nosetests
   - pylint --errors-only hubsync
   - pep8 --max-line-length=90
+  - coverage run --source=hubsync setup.py test
+after_success:
+  - coveralls
