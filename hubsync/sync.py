@@ -100,8 +100,8 @@ class SyncHelper(object):
     def __init__(self, api, config):
         """ Initializes the sync helper
 
-        :type api: hubsync.api
-        :type config: ConfigParser.ConfigParser
+        :type api: hubsync.github.api
+        :type config: hubsync.config.Config
         :param api: github helper
         :param config: parsed global configuration
         """
@@ -139,9 +139,9 @@ class SyncHelper(object):
                     continue
 
             with cd(local_org.path):
-                run_commands(self.config.get('org', 'pre'))
+                run_commands(self.config.org.pre)
                 self.sync_org(local_org, github_org)
-                run_commands(self.config.get('org', 'post'))
+                run_commands(self.config.org.post)
 
     def sync_org(self, local_org, github_origin):
         """Syncs the org across the workspace and the origin
@@ -171,9 +171,9 @@ class SyncHelper(object):
                     continue
 
             with cd(local_repo.path):
-                run_commands(self.config.get('repo', 'pre'))
+                run_commands(self.config.repo.pre)
                 self.sync_repo(local_repo, github_repo)
-                run_commands(self.config.get('repo', 'post'))
+                run_commands(self.config.repo.post)
 
     def sync_repo(self, local_repo, github_repo):
         """Syncs the repo with github

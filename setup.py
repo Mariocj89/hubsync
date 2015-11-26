@@ -13,6 +13,6 @@ setup(
     scripts=['bin/hubsync'],
     test_suite='nose.collector',
     use_2to3=True,
-    install_requires=['gitpython', 'requests'],
+    install_requires=['gitpython', 'requests', 'six'],
     tests_require=['mock']
 )

@@ -4,13 +4,9 @@ import os
 import shutil
 import unittest
 import subprocess
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
 
 import mock
-from hubsync import sync, github, workspace
+from hubsync import sync, github, workspace, config as hs_conifg
 
 
 def gb_api_mock(responses, default_=None):
@@ -52,13 +48,7 @@ class SanityTestCase(unittest.TestCase):
         print("Running tests in {}".format(self.path))
         self.gh_api = github.Api(api_url=self.base_url, user_token='')
         self.ws = workspace.Workspace(self.path)
-        # we should create a wrapper on top of config parser
-        self.config = configparser.ConfigParser(defaults={
-            'pre': [],
-            'post': [],
-        })
-        self.config.add_section('org')
-        self.config.add_section('repo')
+        self.config = hs_conifg.Config()
         self.syncer = sync.SyncHelper(self.gh_api, self.config)
 
     def tearDown(self):
@@ -117,8 +107,8 @@ class SanityTestCase(unittest.TestCase):
             }),
             'repos_url': []
         }, {})
-        self.config.set('org', 'pre', "touch test.pre")
-        self.config.set('org', 'post', "mkdir test.post")
+        self.config.org.pre = "touch test.pre"
+        self.config.org.post = "mkdir test.post"
         self._create_local_org(org_name)
 
         self.assertEqual(['sample_org'], next(os.walk(self.path))[1])
