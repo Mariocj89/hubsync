@@ -25,20 +25,32 @@ class ZipPairsTestCase(unittest.TestCase):
 
     def test_single_element_lists(self):
         self.assertEqual(
-            [(1, 1), (1, None)],
-            list(sync.zip_pairs([1, 1], [1]))
+            set([(1, 1), (1, None)]),
+            set(sync.zip_pairs([1, 1], [1]))
         )
 
     def test_non_matching_elements(self):
         self.assertEqual(
-            [(None, 2), (1, None)],
-            list(sync.zip_pairs([1], [2]))
+            set([(None, 2), (1, None)]),
+            set(sync.zip_pairs([1], [2]))
         )
 
     def test_unordered_matching(self):
         self.assertEqual(
-            [(1, 1), (2, 2)],
-            list(sync.zip_pairs([1, 2], [2, 1]))
+            set([(1, 1), (2, 2)]),
+            set(sync.zip_pairs([1, 2], [2, 1]))
+        )
+
+    def test_diff_length_non_matching_lower(self):
+        self.assertEqual(
+            set([('etcaterva', 'etcaterva'), ('aa', None)]),
+            set(sync.zip_pairs(['aa', 'etcaterva'], ['etcaterva']))
+        )
+
+    def test_diff_length_non_matching_higher(self):
+        self.assertEqual(
+            set([('zz', None), ('etcaterva', 'etcaterva')]),
+            set(sync.zip_pairs(['zz', 'etcaterva'], ['etcaterva']))
         )
 
 if __name__ == '__main__':

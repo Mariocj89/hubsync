@@ -41,7 +41,7 @@ def zip_pairs(xs, ys, key=lambda x: x):
             yield None, ys.pop()
         elif key(xs[-1]) == key(ys[-1]):
             yield xs.pop(), ys.pop()
-        elif key(xs[-1]) > key(ys[-1]):
+        elif key(xs[-1]) < key(ys[-1]):
             yield xs.pop(), None
         else:
             yield None, ys.pop()

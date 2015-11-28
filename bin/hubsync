@@ -30,8 +30,8 @@ if __name__ == "__main__":
                         default=config.github.api_url,
                         help="Base URL for the github instance.")
     parser.add_argument('--github_token', type=str,
-                        required=not config.get('github', 'token'),
-                        default=config.get('github', 'token'),
+                        required=not config.github.token,
+                        default=config.github.token,
                         help="Private user token to get access to github")
     parser.add_argument('--ws_path', type=str,
                         required=not config.workspace.path,
