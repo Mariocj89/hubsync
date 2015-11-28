@@ -55,6 +55,10 @@ def cd(path):
     yield
     os.chdir(saved_path)
 
+def yesno_as_boolean(yesno_string):
+    """converts text containing yes or no to a bool"""
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
+    return valid[yesno_string.lower()]
 
 def input_yesno(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -67,7 +71,6 @@ def input_yesno(question, default="yes"):
     The "answer" return value is True for "yes" or False for "no".
     From ActiveState recipe 577058
     """
-    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     if default is None:
         prompt = " [y/n] "
     elif default == "yes":
@@ -79,13 +82,14 @@ def input_yesno(question, default="yes"):
 
     while True:
         print(question + prompt),
-        choice = raw_input().lower()
+        choice = raw_input()
         if default is not None and choice == '':
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
+            return yesno_as_boolean(default)
         else:
-            print("Please respond with 'yes' or 'no' (or 'y' or 'n').")
+            try:
+                return yesno_as_boolean(choice)
+            except KeyError:
+                print("Please respond with 'yes' or 'no' (or 'y' or 'n').")
 
 
 def run_commands(commands):
@@ -108,6 +112,14 @@ class SyncHelper(object):
         self.api = api
         self.config = config
 
+    def yesno(self, question, default):
+        """Using the local config, prompts the user if necesary"""
+        if self.config.glob.interactive:
+            return input_yesno(question, default)
+        else:
+            return yesno_as_boolean(default)
+
+
     def sync(self, local_workspace, github_api):
         """Syncs using a workspace and a github api
         :param local_workspace:  local workspace object
@@ -124,15 +136,16 @@ class SyncHelper(object):
             if not github_org:
                 print("Found organization {} locally but not in github."
                       .format(local_org.name))
-                if input_yesno("Delete locally?", "no"):
+                if self.yesno("Delete locally?", "no"):
                     shutil.rmtree(local_org.path)
                 continue
 
             if not local_org:
                 print("Found organization {} in github but not locally."
                       .format(github_org.name))
-                if input_yesno("Clone locally?", "yes"):
-                    os.makedirs(github_org.name)
+                if self.yesno("Clone locally?", "yes"):
+                    os.makedirs(os.path.join(local_workspace.path,
+                                             github_org.name))
                     local_org = workspace.Organization(github_org.name,
                                                        local_workspace.path)
                 else:
@@ -156,14 +169,14 @@ class SyncHelper(object):
             if not github_repo:
                 print("Found repo {} locally but not in github."
                       .format(local_repo.name))
-                if input_yesno("Delete locally?", "no"):
+                if self.yesno("Delete locally?", "no"):
                     shutil.rmtree(local_repo.path)
                 continue
 
             if not local_repo:
                 print("Found repo {} in github but not locally."
                       .format(github_repo.name))
-                if input_yesno("Clone locally?", "yes"):
+                if self.yesno("Clone locally?", "yes"):
                     git.Git().clone(github_repo.url)
                     local_repo = workspace.Repo(github_repo.name,
                                                 local_org.path)
@@ -221,7 +234,7 @@ class SyncHelper(object):
                     "{}..origin/master".format(branch.name)))
                 if not commits_ahead and commits_behind:
                     print("Found stale branch {} locally.".format(branch.name))
-                    if input_yesno("Delete locally?", "yes"):
+                    if self.yesno("Delete locally?", "yes"):
                         local_repo.git.delete_head(branch.name)
 
         def sync_fork():
