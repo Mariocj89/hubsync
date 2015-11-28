@@ -55,10 +55,12 @@ def cd(path):
     yield
     os.chdir(saved_path)
 
+
 def yesno_as_boolean(yesno_string):
     """converts text containing yes or no to a bool"""
     valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     return valid[yesno_string.lower()]
+
 
 def input_yesno(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
@@ -118,7 +120,6 @@ class SyncHelper(object):
             return input_yesno(question, default)
         else:
             return yesno_as_boolean(default)
-
 
     def sync(self, local_workspace, github_api):
         """Syncs using a workspace and a github api
