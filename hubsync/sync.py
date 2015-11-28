@@ -166,7 +166,7 @@ class SyncHelper(object):
         LOG.info("Syncing organization {}".format(local_org.name))
         for local_repo, github_repo in zip_pairs(
                 local_org.repos, github_origin.repos,
-                lambda x, y: cmp(x.name, y.name)):
+                lambda x: x.name):
             if not github_repo:
                 print("Found repo {} locally but not in github."
                       .format(local_repo.name))
