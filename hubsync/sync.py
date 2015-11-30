@@ -170,7 +170,7 @@ class SyncHelper(object):
 
             if not local_repo:
                 print("Cloning repo {}".format(github_repo.name))
-                git.Git().clone(github_repo.url)
+                git.Repo.clone_from(github_repo.url, github_repo.name)
                 local_repo = workspace.Repo(github_repo.name, local_org.path)
 
             with cd(local_repo.path):

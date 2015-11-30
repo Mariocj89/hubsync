@@ -4,6 +4,7 @@ import os
 import shutil
 import unittest
 import subprocess
+import git
 
 import mock
 from hubsync import sync, github, workspace, config as hs_conifg
@@ -49,6 +50,7 @@ class SanityTestCase(unittest.TestCase):
         self.gh_api = github.Api(api_url=self.base_url, user_token='')
         self.ws = workspace.Workspace(self.path)
         self.config = hs_conifg.Config()
+        self.config.glob.interactive = False
         self.syncer = sync.SyncHelper(self.gh_api, self.config)
 
     def tearDown(self):
@@ -93,6 +95,51 @@ class SanityTestCase(unittest.TestCase):
         # same result as before the run
         self.assertEqual(path_before, path_after)
 
+    @mock.patch('git.Repo')
+    @mock.patch('hubsync.github.Api.get')
+    def test_org_one_repo_not_locally_get_synced(self, api_get, git_mock):
+        """Test a user with a repo locally already synced makes no change"""
+        org_name = 'sample_org'
+        repo_name = 'sample_repo'
+        api_get.side_effect = gb_api_mock({
+            'orgs': [defaultdict(str, {
+                'url': 'org_url'
+            })],
+            'org_url': defaultdict(str, {
+                'login': org_name,
+                'repos_url': 'repos_url'
+            }),
+            'repos_url': [defaultdict(str, {
+                'url': 'repo_url'
+            })],
+            'repo_url': defaultdict(str, {
+                'owner': {
+                    'login': org_name
+                },
+                'name': repo_name
+            })
+        }, {})
+        self._create_local_org(org_name)
+
+        def create_repo(_, path):
+            print("Mock creating git repo in {}".format(path))
+            os.makedirs(path)
+            git.Git(path)
+
+        git_mock.clone_from.side_effect = create_repo
+
+        self.assertEqual(['sample_org'], next(os.walk(self.path))[1])
+
+        self.syncer.sync(self.ws, self.gh_api)
+
+        self.assertEqual(['sample_org'], next(os.walk(self.path))[1])
+        file_tree = os.walk(self.path)
+        next(file_tree)
+        org_tree = next(file_tree)
+
+        # repo is present now
+        self.assertEqual([repo_name], org_tree[1])
+
     @mock.patch('hubsync.github.Api.get')
     def test_org_pre_post_executed(self, api_get):
         """Test pre and post commands are run"""
@@ -119,7 +166,7 @@ class SanityTestCase(unittest.TestCase):
         next(file_tree)
         org_tree = next(file_tree)
 
-        # no dirs
+        # one dir
         self.assertEqual(['test.post'], org_tree[1])
-        # no files
+        # one file
         self.assertEqual(['test.pre'], org_tree[2])
