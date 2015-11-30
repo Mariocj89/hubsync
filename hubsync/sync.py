@@ -142,15 +142,10 @@ class SyncHelper(object):
                 continue
 
             if not local_org:
-                print("Found organization {} in github but not locally."
-                      .format(github_org.name))
-                if self.yesno("Clone locally?", "yes"):
-                    os.makedirs(os.path.join(local_workspace.path,
-                                             github_org.name))
-                    local_org = workspace.Organization(github_org.name,
-                                                       local_workspace.path)
-                else:
-                    continue
+                print("Cloning organization {}".format(github_org.name))
+                os.makedirs(os.path.join(local_workspace.path, github_org.name))
+                local_org = workspace.Organization(github_org.name,
+                                                   local_workspace.path)
 
             with cd(local_org.path):
                 run_commands(self.config.org.pre)
@@ -175,14 +170,9 @@ class SyncHelper(object):
                 continue
 
             if not local_repo:
-                print("Found repo {} in github but not locally."
-                      .format(github_repo.name))
-                if self.yesno("Clone locally?", "yes"):
-                    git.Git().clone(github_repo.url)
-                    local_repo = workspace.Repo(github_repo.name,
-                                                local_org.path)
-                else:
-                    continue
+                print("Cloning repo {}".format(github_repo.name))
+                git.Git().clone(github_repo.url)
+                local_repo = workspace.Repo(github_repo.name, local_org.path)
 
             with cd(local_repo.path):
                 run_commands(self.config.repo.pre)
