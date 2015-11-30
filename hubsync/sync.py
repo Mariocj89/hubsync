@@ -114,12 +114,11 @@ class SyncHelper(object):
         self.api = api
         self.config = config
 
-    def yesno(self, question, default):
-        """Using the local config, prompts the user if necesary"""
+    def remove_local(self, folder):
+        """Handles the removal of a local folder in function of the config"""
         if self.config.glob.interactive:
-            return input_yesno(question, default)
-        else:
-            return yesno_as_boolean(default)
+            if input_yesno("Delete {}?".format(folder), "no"):
+                shutil.rmtree(folder)
 
     def sync(self, local_workspace, github_api):
         """Syncs using a workspace and a github api
@@ -130,15 +129,13 @@ class SyncHelper(object):
         """
         LOG.debug("Syncing organizations. workspace {} with github {}"
                   .format(local_workspace, github_api))
-        for local_org, github_org in zip_pairs(
-                local_workspace.organizations, github_api.organizations,
-                lambda x: x.name):
-
+        for local_org, github_org in zip_pairs(local_workspace.organizations,
+                                               github_api.organizations,
+                                               lambda x: x.name):
             if not github_org:
                 print("Found organization {} locally but not in github."
                       .format(local_org.name))
-                if self.yesno("Delete locally?", "no"):
-                    shutil.rmtree(local_org.path)
+                self.remove_local(local_org.path)
                 continue
 
             if not local_org:
@@ -160,13 +157,11 @@ class SyncHelper(object):
         """
         LOG.info("Syncing organization {}".format(local_org.name))
         for local_repo, github_repo in zip_pairs(
-                local_org.repos, github_origin.repos,
-                lambda x: x.name):
+                local_org.repos, github_origin.repos, lambda x: x.name):
             if not github_repo:
                 print("Found repo {} locally but not in github."
                       .format(local_repo.name))
-                if self.yesno("Delete locally?", "no"):
-                    shutil.rmtree(local_repo.path)
+                self.remove_local(local_repo.path)
                 continue
 
             if not local_repo:
@@ -224,9 +219,9 @@ class SyncHelper(object):
                 commits_behind = list(local_repo.git.iter_commits(
                     "{}..origin/master".format(branch.name)))
                 if not commits_ahead and commits_behind:
-                    print("Found stale branch {} locally.".format(branch.name))
-                    if self.yesno("Delete locally?", "yes"):
-                        local_repo.git.delete_head(branch.name)
+                    print("Removing stale branch {} locally"
+                          .format(branch.name))
+                    local_repo.git.delete_head(branch.name)
 
         def sync_fork():
             """Syncs and clears the fork (if any)"""
