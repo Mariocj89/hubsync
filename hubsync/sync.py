@@ -25,8 +25,10 @@ LOG = logging.getLogger('hubsync.sync')
 @contextmanager
 def git_wrap(git_item):
     cw = git_item.config_writer
-    yield cw
-    cw.release()
+    try:
+        yield cw
+    finally:
+        cw.release()
 
 
 def zip_pairs(xs, ys, key=lambda x: x):
@@ -52,8 +54,10 @@ def cd(path):
     """Context manager that cds to a path"""
     saved_path = os.getcwd()
     os.chdir(path)
-    yield
-    os.chdir(saved_path)
+    try:
+        yield
+    finally:
+        os.chdir(saved_path)
 
 
 def yesno_as_boolean(yesno_string):
