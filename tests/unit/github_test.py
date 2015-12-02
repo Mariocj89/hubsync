@@ -57,6 +57,41 @@ class ApiTestCase(unittest.TestCase):
         self.api.get = mock.MagicMock(side_effect=call_api)
         self.assertEqual(len(self.api.organizations), 2)
 
+    def test_get_user(self):
+        username = 'mario'
+        def call_api(url):
+            if 'user/org' in url:
+                return []
+            elif 'repos' in url:
+                return [{
+                            'url': 'http://localhost/a_repo'
+                        }]
+            elif 'user' in url:
+                return {
+                    'login': username,
+                    'description': 'description!',
+                    'repos_url': 'http://localhost/repos'
+                }
+            elif 'a_repo' in url:
+                return {
+                    'owner': {
+                        "login": username
+                    },
+                    'name': 'sample_repo',
+                    'description': 'description!',
+                    'ssh_url': 'http://localhost/repos',
+                    'forks_url': 'http://localhost/repos/forks'
+                }
+            else:
+                print url
+                raise ValueError()
+
+        self.api.get = mock.MagicMock(side_effect=call_api)
+        self.assertEqual(len(self.api.organizations), 0)
+        user = self.api.user
+        self.assertEqual(username, user.name)
+        self.assertEqual(len(user.repos), 1)
+
     def test_create_organization(self):
         self.api.get = mock.MagicMock(return_value={
             'login': 'sample_org',

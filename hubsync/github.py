@@ -66,6 +66,14 @@ class Organization(object):
         return [Repo.from_url(self.api, item["url"]) for item in result]
 
 
+class User(Organization):
+    """Handle to the user data in github
+
+    Note that it inherit from Organization as in github users and orgs have
+    a really similar structure.
+    We can change this once we add user specific functionality"""
+
+
 class Api(object):
     """Class that wraps calls to github api"""
 
@@ -83,6 +91,17 @@ class Api(object):
         return requests.get(url, headers={
             "Authorization": "token {}".format(self.token)
         }).json()
+
+    @property
+    def user(self):
+        """Retrieves the user in github
+
+        :returns An User object with handles to github data
+        """
+        user_url = self.base_url + "/user"
+        data = self.get(user_url)
+        return User(self, user_url, data["login"], str(data["login"]) + " repos",
+                    data["repos_url"])
 
     @property
     def organizations(self):
