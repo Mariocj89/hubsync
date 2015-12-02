@@ -59,12 +59,14 @@ class ApiTestCase(unittest.TestCase):
 
     def test_get_user(self):
         username = 'mario'
+
         def call_api(url):
             if 'user/org' in url:
                 return []
             elif 'repos' in url:
                 return [{
-                            'url': 'http://localhost/a_repo'
+                            'url': 'http://localhost/a_repo',
+                            'fork': False
                         }]
             elif 'user' in url:
                 return {
@@ -83,7 +85,6 @@ class ApiTestCase(unittest.TestCase):
                     'forks_url': 'http://localhost/repos/forks'
                 }
             else:
-                print url
                 raise ValueError()
 
         self.api.get = mock.MagicMock(side_effect=call_api)

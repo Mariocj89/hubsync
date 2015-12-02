@@ -48,7 +48,7 @@ class Config(object):
         ws_attrs = ('path',)
         org_attrs = ('pre', 'post')
         repo_attrs = ('path', 'post')
-        global_attrs = ('interactive',)
+        global_attrs = ('interactive', 'sync_user')
         result = {
             'github': _parse_ini_section(parser, 'github', github_attrs),
             'workspace': _parse_ini_section(parser, 'workspace', ws_attrs),
@@ -69,6 +69,7 @@ class Config(object):
         """Hubsync global config"""
         def __init__(self, **kwargs):
             self.interactive = kwargs.pop('interactive', True)
+            self.sync_user = kwargs.pop('sync_user', True)
             assert not kwargs, "Unknown config: {}".format(kwargs.keys())
 
     class Github(object):

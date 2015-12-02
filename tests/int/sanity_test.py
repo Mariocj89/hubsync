@@ -51,6 +51,7 @@ class SanityTestCase(unittest.TestCase):
         self.ws = workspace.Workspace(self.path)
         self.config = hs_conifg.Config()
         self.config.glob.interactive = False
+        self.config.glob.sync_user = False
         self.syncer = sync.SyncHelper(self.gh_api, self.config)
 
     def tearDown(self):
@@ -139,6 +140,46 @@ class SanityTestCase(unittest.TestCase):
 
         # repo is present now
         self.assertEqual([repo_name], org_tree[1])
+
+    @mock.patch('hubsync.github.Api.get')
+    def test_clone_user_repos_no_changes(self, api_get):
+        """Test pre and post commands are run"""
+        self.config.glob.sync_user = True
+        user_name = 'user'
+        api_get.side_effect = gb_api_mock({
+            'user': defaultdict(str, {
+                'login': user_name,
+                'repos_url': 'user/repos_url'
+            }),
+            'orgs': [],
+            'repos_url': []
+        }, {})
+        self._create_local_org(user_name)
+
+        self.assertEqual([user_name], next(os.walk(self.path))[1])
+
+        self.syncer.sync(self.ws, self.gh_api)
+
+        self.assertEqual([user_name], next(os.walk(self.path))[1])
+
+    @mock.patch('hubsync.github.Api.get')
+    def test_clone_user_repo_create_folder(self, api_get):
+        """Test pre and post commands are run"""
+        self.config.glob.sync_user = True
+        user_name = 'user'
+        api_get.side_effect = gb_api_mock({
+            'user': defaultdict(str, {
+                'login': user_name,
+                'repos_url': 'user/repos_url'
+            }),
+            'orgs': [],
+            'repos_url': []
+        }, {})
+        self.assertEqual([], next(os.walk(self.path))[1])
+
+        self.syncer.sync(self.ws, self.gh_api)
+
+        self.assertEqual([user_name], next(os.walk(self.path))[1])
 
     @mock.patch('hubsync.github.Api.get')
     def test_org_pre_post_executed(self, api_get):

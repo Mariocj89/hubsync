@@ -133,8 +133,12 @@ class SyncHelper(object):
         """
         LOG.debug("Syncing organizations. workspace {} with github {}"
                   .format(local_workspace, github_api))
-        for local_org, github_org in zip_pairs(local_workspace.organizations,
-                                               github_api.organizations,
+        local_orgs = local_workspace.organizations
+        github_orgs = github_api.organizations
+        if self.config.glob.sync_user:
+            github_orgs.append(github_api.user)
+        for local_org, github_org in zip_pairs(local_orgs,
+                                               github_orgs,
                                                lambda x: x.name):
             if not github_org:
                 print("Found organization {} locally but not in github."

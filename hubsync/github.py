@@ -72,6 +72,12 @@ class User(Organization):
     Note that it inherit from Organization as in github users and orgs have
     a really similar structure.
     We can change this once we add user specific functionality"""
+    @property
+    def repos(self):
+        """Retrieves the list of repos within an org"""
+        result = self.api.get(self.repos_url)
+        return [Repo.from_url(self.api, item["url"]) for item in result
+                if not item["fork"]]
 
 
 class Api(object):
