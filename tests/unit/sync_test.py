@@ -4,6 +4,14 @@ import unittest
 from hubsync import sync
 
 
+class SyncTestCase(unittest.TestCase):
+    def test_yesno_as_boolean_yes(self):
+        self.assertTrue(sync.yesno_as_boolean("yes"))
+
+    def test_yesno_as_boolean_no(self):
+        self.assertFalse(sync.yesno_as_boolean("no"))
+
+
 class ZipPairsTestCase(unittest.TestCase):
     def test_empty_lists(self):
         self.assertEqual(
