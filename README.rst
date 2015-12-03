@@ -18,4 +18,21 @@ How it works
 ############
 The script mainly relies on your config file ".hubsyncrc" to run all the commands and to customize how to sync your github projects locally
 
+Config File
+###########
+The hubsync config file contains all the configuration that hubsync requires and it is the main way to customize the script.
+
+It should be located in in your home with the name .hubsyncrc (*~/.hubsyncrc*)
+
+An example of its minimun content is:
+
+|   [github]
+|   token: XXXXXXX
+|   [workspace]
+|   path: ~/workspace/test
+|
+
+See `this guide <https://help.github.com/articles/creating-an-access-token-for-command-line-use/>`_ about how to generate a token
+
+
 Note: Work ongoing
