@@ -92,11 +92,23 @@ class Api(object):
         self.base_url = api_url
         self.token = user_token
 
-    def get(self, url):
-        """Performs a get to an url passing the auth header"""
-        return requests.get(url, headers={
+    def post(self, url):
+        """Performs a post to an url passing the auth header"""
+        LOG.debug("Sending post request to {}".format(url))
+        ret = requests.post(url, headers={
             "Authorization": "token {}".format(self.token)
         }).json()
+        LOG.debug("Response: {}".format(ret))
+        return ret
+
+    def get(self, url):
+        """Performs a get to an url passing the auth header"""
+        LOG.debug("Sending get request to {}".format(url))
+        ret = requests.get(url, headers={
+            "Authorization": "token {}".format(self.token)
+        }).json()
+        LOG.debug("Response: {}".format(ret))
+        return ret
 
     @property
     def user(self):

@@ -37,7 +37,12 @@ if __name__ == "__main__":
                         required=not config.workspace.path,
                         default=config.workspace.path,
                         help="base path of your local workspace.")
+    parser.add_argument('--logging', choices=['INFO', 'DEBUG', 'ERROR'],
+                        required=False, default='INFO', type=str,
+                        help="Logging level of the script")
     args = parser.parse_args()
+
+    LOG.setLevel(args.logging)
 
     api_args = {
         "api_url": args.github_api_url,
