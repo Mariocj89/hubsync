@@ -204,17 +204,20 @@ class SyncHelper(object):
                 origin = local_repo.git.remote('origin')
             except ValueError:
                 origin = local_repo.git.create_remote('origin', github_repo.url)
-            with git_wrap(origin) as writer:
-                writer.set('pushurl', 'nopush')
             origin.fetch()
 
-            # set upstream
-            try:
-                upstream = local_repo.git.remote('upstream')
-            except ValueError:
-                upstream = local_repo.git.create_remote('upstream',
-                                                        github_repo.url)
-            upstream.fetch()
+            if github_repo.user != self.api.user.name:
+                # disable push to origin if I am not the owner
+                with git_wrap(origin) as writer:
+                    writer.set('pushurl', 'nopush')
+            else:
+                # otherwise set upstream
+                try:
+                    upstream = local_repo.git.remote('upstream')
+                except ValueError:
+                    upstream = local_repo.git.create_remote('upstream',
+                                                            github_repo.url)
+                upstream.fetch()
 
             # set fork
             if self.config.glob.fork_repos and github_repo.user != self.api.user.name:
