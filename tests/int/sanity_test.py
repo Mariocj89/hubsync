@@ -52,6 +52,7 @@ class SanityTestCase(unittest.TestCase):
         self.config = hs_conifg.Config()
         self.config.glob.interactive = False
         self.config.glob.sync_user = False
+        self.config.glob.fork_repos = False
         self.syncer = sync.SyncHelper(self.gh_api, self.config)
 
     def tearDown(self):
@@ -103,6 +104,10 @@ class SanityTestCase(unittest.TestCase):
         org_name = 'sample_org'
         repo_name = 'sample_repo'
         api_get.side_effect = gb_api_mock({
+            'user': defaultdict(str, {
+                'login': 'user',
+                'repos_url': 'user/repos_url'
+            }),
             'orgs': [defaultdict(str, {
                 'url': 'org_url'
             })],

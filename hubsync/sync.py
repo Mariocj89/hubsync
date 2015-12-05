@@ -185,6 +185,8 @@ class SyncHelper(object):
     def sync_repo(self, local_repo, github_repo):
         """Syncs the repo with github
 
+        :type github_repo: hubsync.github.Repo
+        :type local_repo: hubsync.workspace.Repo
         It syncs remotes and branches
         """
         LOG.info("Syncing repo {}".format(local_repo.name))
@@ -215,7 +217,13 @@ class SyncHelper(object):
             upstream.fetch()
 
             # set fork
-            # TODO
+            if self.config.glob.fork_repos and github_repo.user != self.api.user.name:
+                try:
+                    local_repo.git.remote('fork')
+                except ValueError:
+                    fork_url = str(github_repo.url).replace(
+                        github_repo.user, self.api.user.name, 1)
+                    local_repo.git.create_remote('fork', fork_url)
 
         def sync_branches():
             """Sincs/update/clean local/fork branches"""
@@ -233,8 +241,16 @@ class SyncHelper(object):
 
         def sync_fork():
             """Syncs and clears the fork (if any)"""
-            pass
+            already_forked = any(fork.owner == self.api.user.name
+                                 for fork in github_repo.forks)
+            already_forked = already_forked or (github_repo.user == self.api.user.name)
+            if not already_forked:
+                LOG.info("Creating a fork for {}".format(local_repo.name))
+                github_repo.fork()
+            else:
+                LOG.debug("{} is already forked".format(local_repo.name))
 
         sync_remotes()
         sync_branches()
-        sync_fork()
+        if self.config.glob.fork_repos:
+            sync_fork()

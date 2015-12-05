@@ -36,6 +36,10 @@ class Repo(object):
         return [Fork(item["name"], item["description"], self.name,
                      item["ssh_url"], self.url) for item in result]
 
+    def fork(self):
+        """Forks the repo to the current user"""
+        self.api.post(self._forks_url)
+
 
 class Organization(object):
     """Represents an organization"""

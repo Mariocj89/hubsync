@@ -14,10 +14,18 @@ class ApiTestCase(unittest.TestCase):
         self.api = Api('sample_url', 'awesome token')
 
     @mock.patch('hubsync.github.requests')
-    def test_token_is_sent_in_header(self, requests_mock):
+    def test_get_token_is_sent_in_header(self, requests_mock):
         requests_mock.get.return_value = mock.MagicMock()
         self.api.get('test')
         headers = requests_mock.get.call_args[1]['headers']
+        self.assertTrue('Authorization' in headers)
+        self.assertTrue('awesome token' in headers['Authorization'])
+
+    @mock.patch('hubsync.github.requests')
+    def test_post_token_is_sent_in_header(self, requests_mock):
+        requests_mock.post.return_value = mock.MagicMock()
+        self.api.post('test')
+        headers = requests_mock.post.call_args[1]['headers']
         self.assertTrue('Authorization' in headers)
         self.assertTrue('awesome token' in headers['Authorization'])
 
@@ -143,6 +151,12 @@ class ApiTestCase(unittest.TestCase):
 
         tested_repo = Repo(self.api, 'user', 'name', 'desc', 'the_url', 'forks')
         self.assertEqual(1, len(tested_repo.forks))
+
+    @mock.patch('hubsync.github.Api.post')
+    def test_create_fork_posts(self, requests_mock):
+        tested_repo = Repo(self.api, 'user', 'name', 'desc', 'the_url', 'forks')
+        tested_repo.fork()
+        requests_mock.assert_called_with('forks')
 
 
 if __name__ == '__main__':

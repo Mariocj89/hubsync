@@ -48,7 +48,7 @@ class Config(object):
         ws_attrs = ('path',)
         org_attrs = ('pre', 'post')
         repo_attrs = ('path', 'post')
-        global_attrs = ('interactive', 'sync_user')
+        global_attrs = ('interactive', 'sync_user', 'fork_repos')
         result = {
             'github': _parse_ini_section(parser, 'github', github_attrs),
             'workspace': _parse_ini_section(parser, 'workspace', ws_attrs),
@@ -70,6 +70,7 @@ class Config(object):
         def __init__(self, **kwargs):
             self.interactive = kwargs.pop('interactive', True)
             self.sync_user = kwargs.pop('sync_user', True)
+            self.fork_repos = kwargs.pop('fork_repos', True)
             assert not kwargs, "Unknown config: {}".format(kwargs.keys())
 
     class Github(object):
