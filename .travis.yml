@@ -7,8 +7,10 @@ addons:
   apt:
     packages:
       - pylint
-install:
+before_install:
   - pip install coveralls
+  - pip install codecov
+install:
   - pip install pep8
   - pip install -r requirements.txt
 script:
@@ -18,3 +20,4 @@ script:
   - coverage run --source=hubsync setup.py test
 after_success:
   - coveralls
+  - codecov
