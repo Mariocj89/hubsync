@@ -1,4 +1,7 @@
-"""Sanity tests"""
+"""Simple Sanity tests
+
+Simple sanity tests that target some specific features in hubsync.sync
+"""
 from collections import defaultdict
 import os
 import shutil

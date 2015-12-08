@@ -8,7 +8,7 @@ import logging
 import argparse
 import pprint
 
-from hubsync import github, config as hubsync_config
+from hubsync import sync, github, config as hubsync_config
 
 
 LOG = logging.getLogger('hubsync.scrapper')
@@ -17,7 +17,7 @@ LOG.addHandler(logging.StreamHandler())
 
 
 class Scrapper(object):
-    def __init__(self, api, max_depth):
+    def __init__(self, api, max_depth, interactive=False):
         """
 
         :type api: hubsync.github.Api
@@ -27,11 +27,15 @@ class Scrapper(object):
         self.api = api
         self.max_depth = max_depth
         self.res = dict()
+        self.interactive = interactive
 
     def scrap(self, target, recursion=0):
-        """Scraps an target"""
+        """Scraps an target
+
+        Returns self so you can chain calls
+        """
         if recursion > self.max_depth:
-            return self.res
+            return self
 
         LOG.debug("[{}] Scrapping {}".format(recursion, target))
         if isinstance(target, dict):
@@ -51,10 +55,12 @@ class Scrapper(object):
                     data = self.api.get(target)
                 except ValueError:
                     data = "NOT JSON"
-                self.res[target] = data
-                self.scrap(data, recursion + 1)
+                question = "Add url {}".format(target)
+                if not self.interactive or sync.input_yesno(question):
+                    self.res[target] = data
+                    self.scrap(data, recursion + 1)
 
-        return self.res
+        return self
 
 
 def main():
@@ -79,6 +85,8 @@ def main():
                         help="Out file to save the result")
     parser.add_argument('--max_depth', type=int, required=False, default=3,
                         help="How deep to go in the scrapping of urls")
+    parser.add_argument('--interactive', default=False, action="store_true",
+                        help="Whether or not to ask for confirmation to save an url")
     args = parser.parse_args()
 
     LOG.setLevel(args.logging)
@@ -89,9 +97,38 @@ def main():
     }
 
     api = github.Api(**api_args)
-    res = Scrapper(api, args.max_depth).scrap(api.base_url + '/user')
+    scraper = Scrapper(api, args.max_depth, args.interactive)
+    scraper.scrap(api.base_url + '/user/orgs')
+    scraper.max_depth = 0
+    scraper.scrap(api.base_url + '/user')
+    scraper.scrap(api.base_url + '/user/orgs')
+    scraper.scrap(api.base_url + '/orgs/etcaterva')
+    scraper.scrap(api.base_url + '/user')
+    scraper.scrap(api.base_url + '/users/Mariocj89/repos')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/config-files')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/hubsync')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/OnlineWBS')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/price-scraper')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/uni')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/OnlineWBS/forks')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/config-files/forks')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/hubsync/forks')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/price-scraper/forks')
+    scraper.scrap(api.base_url + '/repos/Mariocj89/uni/forks')
+    scraper.scrap(api.base_url + '/orgs/etcaterva/repos')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EtCatervaGroup')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EchaloASuerte')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EtCaterva-Ansible')
+    scraper.scrap(api.base_url + '/repos/etcaterva/Echaloasuerte_legacy')
+    scraper.scrap(api.base_url + '/repos/etcaterva/Echaloasuerte-android')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EchaloASuerte/forks')
+    scraper.scrap(api.base_url + '/repos/etcaterva/Echaloasuerte-android/forks')
+    scraper.scrap(api.base_url + '/repos/etcaterva/Echaloasuerte_legacy/forks')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EtCaterva-Ansible/forks')
+    scraper.scrap(api.base_url + '/repos/etcaterva/EtCatervaGroup/forks')
+
     with open(args.output_file, 'w') as output:
-        pprint.pprint(res, output)
+        pprint.pprint(scraper.res, output)
 
 
 if __name__ == "__main__":
