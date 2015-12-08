@@ -244,7 +244,7 @@ class SyncHelper(object):
 
         def sync_fork():
             """Syncs and clears the fork (if any)"""
-            already_forked = any(fork.owner == self.api.user.name
+            already_forked = any(fork.fork_owner == self.api.user.name
                                  for fork in github_repo.forks)
             already_forked = already_forked or (github_repo.user == self.api.user.name)
             if not already_forked:

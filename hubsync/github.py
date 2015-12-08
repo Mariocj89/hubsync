@@ -95,6 +95,7 @@ class Api(object):
         """
         self.base_url = api_url
         self.token = user_token
+        self._user = None
 
     def post(self, url):
         """Performs a post to an url passing the auth header"""
@@ -120,10 +121,12 @@ class Api(object):
 
         :returns An User object with handles to github data
         """
-        user_url = self.base_url + "/user"
-        data = self.get(user_url)
-        return User(self, user_url, data["login"], str(data["login"]) + " repos",
-                    data["repos_url"])
+        if not self._user:
+            user_url = self.base_url + "/user"
+            data = self.get(user_url)
+            self._user = User(self, user_url, data["login"], str(data["login"])
+                              + " repos", data["repos_url"])
+        return self._user
 
     @property
     def organizations(self):
