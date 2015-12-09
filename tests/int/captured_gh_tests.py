@@ -40,7 +40,7 @@ class RecordedGithubTestCase(unittest.TestCase):
         self.config.glob.sync_user = False
         self.config.glob.fork_repos = False
 
-        with open(os.path.join(DIR, "gh_responses.pickle")) as pickled_file:
+        with open(os.path.join(DIR, "gh_responses.pickle"), "rb") as pickled_file:
             responses = pickle.load(pickled_file)
 
         def faked_req(key):

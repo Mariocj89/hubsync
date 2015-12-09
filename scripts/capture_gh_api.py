@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import logging
 import argparse
 import pickle
+import six
 
 from hubsync import sync, github, config as hubsync_config
 
@@ -44,7 +45,7 @@ class Scrapper(object):
         if isinstance(target, (list, tuple)):
             for new_url in target:
                 self.scrap(new_url, recursion)
-        if isinstance(target, basestring):
+        if isinstance(target, six.string_types):
             try:
                 target = target[:target.index("{")]
             except ValueError:
@@ -127,8 +128,8 @@ def main():
     scraper.scrap(api.base_url + '/repos/etcaterva/EtCaterva-Ansible/forks')
     scraper.scrap(api.base_url + '/repos/etcaterva/EtCatervaGroup/forks')
 
-    with open(args.output_file, 'w') as output:
-        pickle.dump(scraper.res, output, 2)
+    with open(args.output_file, 'wb') as output:
+        pickle.dump(scraper.res, output, 1)
 
 
 if __name__ == "__main__":
