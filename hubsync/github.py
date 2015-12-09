@@ -92,8 +92,9 @@ class Api(object):
 
         :param api_url: base url for github api
         :param user_token: user token to get access to github
+        :type api_url: str
         """
-        self.base_url = api_url
+        self.base_url = api_url.rstrip('/')
         self.token = user_token
         self._user = None
 

@@ -6,7 +6,7 @@ It will scrap the whole github api and save the responses in an python file
 from __future__ import unicode_literals
 import logging
 import argparse
-import pprint
+import pickle
 
 from hubsync import sync, github, config as hubsync_config
 
@@ -81,7 +81,7 @@ def main():
                         required=False, default='INFO', type=str,
                         help="Logging level of the script")
     parser.add_argument('--output_file', type=str, required=False,
-                        default='gh_responses.py',
+                        default='gh_responses.pickle',
                         help="Out file to save the result")
     parser.add_argument('--max_depth', type=int, required=False, default=3,
                         help="How deep to go in the scrapping of urls")
@@ -128,7 +128,7 @@ def main():
     scraper.scrap(api.base_url + '/repos/etcaterva/EtCatervaGroup/forks')
 
     with open(args.output_file, 'w') as output:
-        pprint.pprint(scraper.res, output)
+        pickle.dump(scraper.res, output, 2)
 
 
 if __name__ == "__main__":
