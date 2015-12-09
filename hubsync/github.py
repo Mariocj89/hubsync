@@ -124,8 +124,8 @@ class Api(object):
         if not self._user:
             user_url = self.base_url + "/user"
             data = self.get(user_url)
-            self._user = User(self, user_url, data["login"], str(data["login"])
-                              + " repos", data["repos_url"])
+            self._user = User(self, user_url, data["login"], str(data["login"]) +
+                              " repos", data["repos_url"])
         return self._user
 
     @property

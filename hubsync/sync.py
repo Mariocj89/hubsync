@@ -118,6 +118,11 @@ class SyncHelper(object):
         self.api = api
         self.config = config
 
+        if self.config.glob.case_sensitive:
+            self._key_extractor = lambda x: x.name
+        else:
+            self._key_extractor = lambda x: str(x.name).lower()
+
     def remove_local(self, folder):
         """Handles the removal of a local folder in function of the config"""
         if self.config.glob.interactive:
@@ -139,7 +144,7 @@ class SyncHelper(object):
             github_orgs.append(github_api.user)
         for local_org, github_org in zip_pairs(local_orgs,
                                                github_orgs,
-                                               lambda x: x.name):
+                                               self._key_extractor):
             if not github_org:
                 print("Found organization {} locally but not in github."
                       .format(local_org.name))
@@ -165,7 +170,7 @@ class SyncHelper(object):
         """
         LOG.info("Syncing organization {}".format(local_org.name))
         for local_repo, github_repo in zip_pairs(
-                local_org.repos, github_origin.repos, lambda x: x.name):
+                local_org.repos, github_origin.repos, self._key_extractor):
             if not github_repo:
                 print("Found repo {} locally but not in github."
                       .format(local_repo.name))
