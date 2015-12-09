@@ -44,7 +44,7 @@ class Config(object):
         :return Config
         """
         parser = _get_config_parser(path)
-        github_attrs = ('token', 'token')
+        github_attrs = ('token', 'api_url')
         ws_attrs = ('path',)
         org_attrs = ('pre', 'post')
         repo_attrs = ('path', 'post')

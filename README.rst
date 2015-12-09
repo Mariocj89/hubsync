@@ -8,11 +8,13 @@
     :target: https://badge.fury.io/py/hubsync
 
 
-Objective
+Hubsync
 #########
-This scripts allows you to keep the organization you work in sync with your local workspace.
+This script allows you to keep the organization you work in sync with your local workspace.
 
 The main objective is to centralize your workflow and integrate all the syncronization and cleaning activities you perform daily related to your local file structure and your github organization
+
+You can get it with deom pip with "pip install hubsync".
 
 How it works
 ############
@@ -24,7 +26,7 @@ The hubsync config file contains all the configuration that hubsync requires and
 
 It should be located in in your home with the name .hubsyncrc (*~/.hubsyncrc*)
 
-An example of its minimun content is:
+An example of its minimun content (mandatory params) is:
 
 |   [github]
 |   token: XXXXXXX
