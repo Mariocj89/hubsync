@@ -71,14 +71,14 @@ class Config(object):
         def __init__(self, **kwargs):
             self.interactive = kwargs.pop('interactive', True)
             self.sync_user = kwargs.pop('sync_user', True)
-            self.fork_repos = kwargs.pop('fork_repos', True)
+            self.fork_repos = kwargs.pop('fork_repos', False)
             self.case_sensitive = kwargs.pop('case_sensitive', True)
             assert not kwargs, "Unknown config: {}".format(kwargs.keys())
 
     class Github(object):
         """Github global config"""
         def __init__(self, **kwargs):
-            self.api_url = kwargs.pop('url', 'https://api.github.com')
+            self.api_url = kwargs.pop('api_url', 'https://api.github.com')
             self.token = kwargs.pop('token', None)
             assert not kwargs, "Unknown config: {}".format(kwargs.keys())
 
