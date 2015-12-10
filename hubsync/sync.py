@@ -209,7 +209,7 @@ class SyncHelper(object):
                 origin = local_repo.git.remote('origin')
             except ValueError:
                 origin = local_repo.git.create_remote('origin', github_repo.url)
-            origin.fetch()
+            origin.pull()
 
             if github_repo.user != self.api.user.name:
                 # disable push to origin if I am not the owner
@@ -245,7 +245,10 @@ class SyncHelper(object):
                 if not commits_ahead and commits_behind:
                     print("Removing stale branch {} locally"
                           .format(branch.name))
-                    local_repo.git.delete_head(branch.name)
+                    try:
+                        local_repo.git.delete_head(branch.name)
+                    except git.exc.GitCommandError as err:
+                        LOG.error("Failed to delete branch, {}".format(err))
 
         def sync_fork():
             """Syncs and clears the fork (if any)"""
