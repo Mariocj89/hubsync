@@ -3,6 +3,9 @@ import os
 from six.moves import configparser
 
 
+FALSY_VALUES = ['False', 'false', 'no']
+
+
 def _parse_ini_section(config, section, attributes):
     """Extracts a section from a config parser
 
@@ -19,7 +22,11 @@ def _parse_ini_section(config, section, attributes):
     ret = {}
     for attr in attributes:
         try:
-            ret[attr] = config.get(section, attr)
+            value = config.get(section, attr)
+            if value in FALSY_VALUES:
+                ret[attr] = False
+            else:
+                ret[attr] = value
         except configparser.NoOptionError:
             continue
         except configparser.NoSectionError:
@@ -55,7 +62,7 @@ class Config(object):
             'workspace': _parse_ini_section(parser, 'workspace', ws_attrs),
             'org': _parse_ini_section(parser, 'org', org_attrs),
             'repo': _parse_ini_section(parser, 'repo', repo_attrs),
-            'glob': _parse_ini_section(parser, 'glob', global_attrs),
+            'glob': _parse_ini_section(parser, 'global', global_attrs),
         }
         return Config(**result)
 
