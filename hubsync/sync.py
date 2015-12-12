@@ -222,9 +222,7 @@ class SyncHelper(object):
                     upstream = local_repo.git.create_remote('upstream',
                                                             github_repo.url)
                 upstream.fetch()
-
-            # set fork
-            if self.config.glob.fork_repos and github_repo.user != self.api.user.name:
+                # set fork
                 try:
                     local_repo.git.remote('fork')
                 except ValueError:

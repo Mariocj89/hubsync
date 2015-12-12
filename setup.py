@@ -4,7 +4,7 @@ from setuptools import setup
 setup(
     name='hubsync',
     packages=['hubsync'],
-    version='0.2.8',
+    version='0.2.9',
     description='Get your github workspace synced!',
     author='Mario Corchero',
     author_email='mariocj89@gmail.com',
