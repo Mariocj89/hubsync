@@ -30,6 +30,8 @@ Moreover, within your local repostiories it will delete all stale branches and s
 - upstream: url of the main repo (both pull and push)
 - fork: url of a fork of the repo within your user space
 
+Note that if you are the owner of the repo only origin will be set
+
 Config File
 ###########
 The hubsync config file contains all the configuration that hubsync requires and it is the main way to customize the script.

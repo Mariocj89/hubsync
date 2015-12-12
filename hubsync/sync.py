@@ -215,8 +215,7 @@ class SyncHelper(object):
                 # disable push to origin if I am not the owner
                 with git_wrap(origin) as writer:
                     writer.set('pushurl', 'nopush')
-            else:
-                # otherwise set upstream
+                # and set upstream
                 try:
                     upstream = local_repo.git.remote('upstream')
                 except ValueError:
